@@ -1,8 +1,12 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:ionicons/ionicons.dart';
+import 'package:onboarding_app/providers/onboarding_provider.dart';
+import 'package:provider/provider.dart';
 
 class OnboardingScreen extends StatefulWidget {
+  static const activeColor = Color(0Xff6c63ff);
+
   const OnboardingScreen({super.key});
 
   @override
@@ -11,10 +15,11 @@ class OnboardingScreen extends StatefulWidget {
 
 class _OnboardingScreenState extends State<OnboardingScreen> {
   final PageController _pageController = PageController();
-  int _currentPage = 0;
+
+  // int _currentPage = 0;
   final _formKey = GlobalKey<FormState>();
 
-  String? selectedGender;
+  // String? selectedGender;
 
   List<String> days = List.generate(
     31,
@@ -78,23 +83,42 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             Expanded(
-              child: PageView(
-                controller: _pageController,
-                onPageChanged: (index) {
-                  setState(() {
-                    _currentPage = index;
-                  });
+              // child: PageView(
+              //   controller: _pageController,
+              //   onPageChanged: (index) {
+              //     setState(() {
+              //       _currentPage = index;
+              //     });
+              //   },
+              //   children: [
+              //     _buildGenderSection(),
+              //     _buildBirthdateSection(),
+              //     _buildWeightSection(),
+              //     _buildHeightSection(),
+              //     _buildTargetWeightSection(),
+              //     _buildGoalSection(),
+              //     _buildActivityLevelSection(),
+              //     _buildDietSection(),
+              //   ],
+              // ),
+              child: Consumer<OnboardingProvider>(
+                builder: (context, onboardingProvider, child) {
+                  return PageView(
+                    controller: _pageController,
+                    onPageChanged:
+                        (index) => onboardingProvider.currentPageIndex(index),
+                    children: [
+                      _buildGenderSection(),
+                      _buildBirthdateSection(),
+                      _buildWeightSection(),
+                      _buildHeightSection(),
+                      _buildTargetWeightSection(),
+                      _buildGoalSection(),
+                      _buildActivityLevelSection(),
+                      _buildDietSection(),
+                    ],
+                  );
                 },
-                children: [
-                  _buildGenderSection(),
-                  _buildBirthdateSection(),
-                  _buildWeightSection(),
-                  _buildHeightSection(),
-                  _buildTargetWeightSection(),
-                  _buildGoalSection(),
-                  _buildActivityLevelSection(),
-                  _buildDietSection(),
-                ],
               ),
             ),
             _buildNavigationBar(),
@@ -132,42 +156,47 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
   }
 
   Widget _buildGenderOption(String gender, String imagePath) {
-    final isSelected = selectedGender == gender;
-    return GestureDetector(
-      onTap: () {
-        setState(() {
-          selectedGender = gender;
-        });
-      },
-      child: Column(
-        children: [
-          Container(
-            padding: EdgeInsets.all(4),
-            decoration: BoxDecoration(
-              shape: BoxShape.circle,
-              border: Border.all(
-                color: isSelected ? Colors.deepPurple : Colors.grey.shade300,
-                width: 2,
+    return Consumer<OnboardingProvider>(
+      builder: (context, onboardingProvider, child) {
+        final isSelected = onboardingProvider.selectedGender == gender;
+        return GestureDetector(
+          onTap: () => onboardingProvider.selectGender(gender),
+          child: Column(
+            children: [
+              Container(
+                padding: EdgeInsets.all(4),
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  border: Border.all(
+                    color:
+                        isSelected
+                            ? OnboardingScreen.activeColor
+                            : Colors.grey.shade300,
+                    width: 2,
+                  ),
+                ),
+                child: CircleAvatar(
+                  radius: 50,
+                  backgroundImage: AssetImage(imagePath),
+                  backgroundColor: Colors.transparent,
+                ),
               ),
-            ),
-            child: CircleAvatar(
-              radius: 50,
-              backgroundImage: AssetImage(imagePath),
-              backgroundColor: Colors.transparent,
-            ),
+              const SizedBox(height: 8),
+              Text(
+                gender,
+                style: TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.w500,
+                  color:
+                      isSelected ? OnboardingScreen.activeColor : Colors.black,
+                ),
+              ),
+            ],
           ),
-          const SizedBox(height: 8),
-          Text(
-            gender,
-            style: TextStyle(
-              fontSize: 16,
-              fontWeight: FontWeight.w500,
-              color: isSelected ? Colors.deepPurple : Colors.black,
-            ),
-          ),
-        ],
-      ),
+        );
+      },
     );
+    ;
   }
 
   //birthdate section
@@ -242,7 +271,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
               fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
               color:
                   isSelected
-                      ? CupertinoColors.activeBlue
+                      ? OnboardingScreen.activeColor
                       : CupertinoColors.black,
             ),
           ),
@@ -324,9 +353,9 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                   onValueChanged: (value) {
                     setState(() => selectedUnit = value);
                   },
-                  selectedColor: CupertinoColors.activeBlue,
+                  selectedColor: OnboardingScreen.activeColor,
                   unselectedColor: CupertinoColors.white,
-                  borderColor: CupertinoColors.activeBlue,
+                  borderColor: OnboardingScreen.activeColor,
                   pressedColor: CupertinoColors.systemGrey4,
                 ),
               ],
@@ -363,7 +392,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                 fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
                 color:
                     isSelected
-                        ? CupertinoColors.activeBlue
+                        ? OnboardingScreen.activeColor
                         : CupertinoColors.black,
               ),
             ),
@@ -380,7 +409,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
         text,
         style: TextStyle(
           fontSize: 18,
-          color: CupertinoColors.activeBlue,
+          color: OnboardingScreen.activeColor,
           fontWeight: FontWeight.w600,
         ),
       ),
@@ -452,9 +481,9 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                   onValueChanged: (value) {
                     setState(() => selectedUnit = value);
                   },
-                  selectedColor: CupertinoColors.activeBlue,
+                  selectedColor: OnboardingScreen.activeColor,
                   unselectedColor: CupertinoColors.white,
-                  borderColor: CupertinoColors.activeBlue,
+                  borderColor: OnboardingScreen.activeColor,
                   pressedColor: CupertinoColors.systemGrey4,
                 ),
               ],
@@ -491,7 +520,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                 fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
                 color:
                     isSelected
-                        ? CupertinoColors.activeBlue
+                        ? OnboardingScreen.activeColor
                         : CupertinoColors.black,
               ),
             ),
@@ -508,7 +537,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
         text,
         style: TextStyle(
           fontSize: 18,
-          color: CupertinoColors.activeBlue,
+          color: OnboardingScreen.activeColor,
           fontWeight: FontWeight.w600,
         ),
       ),
@@ -580,9 +609,9 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                   onValueChanged: (value) {
                     setState(() => selectedUnit = value);
                   },
-                  selectedColor: CupertinoColors.activeBlue,
+                  selectedColor: OnboardingScreen.activeColor,
                   unselectedColor: CupertinoColors.white,
-                  borderColor: CupertinoColors.activeBlue,
+                  borderColor: OnboardingScreen.activeColor,
                   pressedColor: CupertinoColors.systemGrey4,
                 ),
               ],
@@ -619,7 +648,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                 fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
                 color:
                     isSelected
-                        ? CupertinoColors.activeBlue
+                        ? OnboardingScreen.activeColor
                         : CupertinoColors.black,
               ),
             ),
@@ -636,7 +665,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
         text,
         style: TextStyle(
           fontSize: 18,
-          color: CupertinoColors.activeBlue,
+          color: OnboardingScreen.activeColor,
           fontWeight: FontWeight.w600,
         ),
       ),
@@ -653,7 +682,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
         children: [
           Text(
             "What’s your Physical\nActivity Level?",
-            style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
+            style: TextStyle(fontSize: 25, fontWeight: FontWeight.bold),
           ),
           const SizedBox(height: 50),
           ...levels.map((level) => _buildActivityLevelOption(level)).toList(),
@@ -675,7 +704,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
         margin: const EdgeInsets.only(bottom: 16),
         padding: const EdgeInsets.symmetric(vertical: 16),
         decoration: BoxDecoration(
-          color: isSelected ? Colors.deepPurpleAccent : Colors.white,
+          color: isSelected ? OnboardingScreen.activeColor : Colors.white,
           border: Border.all(color: Colors.grey.shade300),
           borderRadius: BorderRadius.circular(10),
         ),
@@ -702,9 +731,9 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
         children: [
           Text(
             "What’s your Goal?",
-            style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
+            style: TextStyle(fontSize: 25, fontWeight: FontWeight.bold),
           ),
-          const SizedBox(height: 80),
+          const SizedBox(height: 85),
           ...goals.map((goal) => _buildGoalOption(goal)).toList(),
         ],
       ),
@@ -724,7 +753,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
         margin: const EdgeInsets.only(bottom: 16),
         padding: const EdgeInsets.symmetric(vertical: 16),
         decoration: BoxDecoration(
-          color: isSelected ? Colors.deepPurpleAccent : Colors.white,
+          color: isSelected ? OnboardingScreen.activeColor : Colors.white,
           border: Border.all(color: Colors.grey.shade300),
           borderRadius: BorderRadius.circular(10),
         ),
@@ -751,7 +780,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
         children: [
           Text(
             "Which diet do you \n prefer?",
-            style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
+            style: TextStyle(fontSize: 25, fontWeight: FontWeight.bold),
           ),
           const SizedBox(height: 50),
           ...diets.map((diet) => _buildDietOption(diet)).toList(),
@@ -773,7 +802,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
         margin: const EdgeInsets.only(bottom: 16),
         padding: const EdgeInsets.symmetric(vertical: 16),
         decoration: BoxDecoration(
-          color: isSelected ? Colors.deepPurpleAccent : Colors.white,
+          color: isSelected ? OnboardingScreen.activeColor : Colors.white,
           border: Border.all(color: Colors.grey.shade300),
           borderRadius: BorderRadius.circular(10),
         ),
@@ -795,60 +824,66 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
   Widget _buildNavigationBar() {
     return Container(
       padding: EdgeInsets.all(20),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          // _currentPage > 0
-          //     ? TextButton(
-          //       onPressed: () {
-          //         _pageController.previousPage(
-          //           duration: Duration(milliseconds: 300),
-          //           curve: Curves.easeInOut,
-          //         );
-          //       },
-          //       child: Text('Back'),
-          //     )
-          //     : SizedBox(),
-          Row(
-            children: List.generate(
-              8,
-              (index) => Container(
-                width: 8,
-                height: 8,
-                margin: EdgeInsets.symmetric(horizontal: 4),
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  color:
-                      _currentPage == index
-                          ? Theme.of(context).primaryColor
-                          : Colors.grey[300],
-                ),
-              ),
-            ),
-          ),
-          _currentPage < 8
-              ? IconButton(
-                style: IconButton.styleFrom(
-                  backgroundColor: Colors.deepPurpleAccent,
-                ),
-                onPressed: () {
-                  if (_currentPage == 1 && !_formKey.currentState!.validate()) {
-                    return;
-                  }
-                  _pageController.nextPage(
-                    duration: Duration(milliseconds: 300),
-                    curve: Curves.easeInOut,
-                  );
-                },
-                icon: Icon(Ionicons.arrow_forward, color: Colors.white),
-              )
-              : ElevatedButton(
-                onPressed: null,
 
-                // onPressed: _completeOnboarding,
-                child: Text('Get Started'),
+      child: Consumer<OnboardingProvider>(
+        builder: (context, onboardingProvider, child) {
+          return Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              // _currentPage > 0
+              //     ? TextButton(
+              //       onPressed: () {
+              //         _pageController.previousPage(
+              //           duration: Duration(milliseconds: 300),
+              //           curve: Curves.easeInOut,
+              //         );
+              //       },
+              //       child: Text('Back'),
+              //     )
+              //     : SizedBox(),
+              Row(
+                children: List.generate(
+                  8,
+                  (index) => Container(
+                    width: 8,
+                    height: 8,
+                    margin: EdgeInsets.symmetric(horizontal: 4),
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      color:
+                          onboardingProvider.currentPage == index
+                              ? OnboardingScreen.activeColor
+                              : Colors.grey[300],
+                    ),
+                  ),
+                ),
               ),
-        ],
+              onboardingProvider.currentPage < 8
+                  ? IconButton(
+                    style: IconButton.styleFrom(
+                      backgroundColor: OnboardingScreen.activeColor,
+                    ),
+                    onPressed: () {
+                      if (onboardingProvider.currentPage == 1 &&
+                          !_formKey.currentState!.validate()) {
+                        return;
+                      }
+                      _pageController.nextPage(
+                        duration: Duration(milliseconds: 300),
+                        curve: Curves.easeInOut,
+                      );
+                    },
+                    icon: Icon(Ionicons.arrow_forward, color: Colors.white),
+                  )
+                  : ElevatedButton(
+                    onPressed: null,
+
+                    // onPressed: _completeOnboarding,
+                    child: Text('Get Started'),
+                  ),
+            ],
+          );
+        },
       ),
     );
   }
