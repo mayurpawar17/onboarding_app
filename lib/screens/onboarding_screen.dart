@@ -19,8 +19,6 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
   // int _currentPage = 0;
   final _formKey = GlobalKey<FormState>();
 
-  // String? selectedGender;
-
   List<String> days = List.generate(
     31,
     (index) => (index + 1).toString().padLeft(2, '0'),
@@ -41,36 +39,16 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
   ];
   List<String> years = List.generate(40, (index) => (1985 + index).toString());
 
-  int selectedDay = 0;
-  int selectedMonth = 0;
-  int selectedYear = 5;
-
-  // Unit selection: 0 = cm, 1 = ft
-  int selectedUnit = 1;
-
   final List<int> feetList = List.generate(9, (index) => index + 1); // 1 to 9
   final List<int> inchList = List.generate(11, (index) => index); // 0 to 10
   final List<int> cmList = List.generate(
-    151,
+    250,
     (index) => index + 50,
   ); // 50 to 200
 
-  int selectedFeet = 5;
-  int selectedInch = 6;
-  int selectedCm = 170;
-
-  //goal section
-  String selectedGoal = 'Keep Fit';
-
   final List<String> goals = ['Lose Weight', 'Gain Muscle', 'Keep Fit'];
 
-  //activity level section
-  String selectedLevel = 'Beginner';
-
   final List<String> levels = ['Beginner', 'Intermediate', 'Advance'];
-
-  //diet section
-  String selectedDiet = 'Vegetarian';
 
   final List<String> diets = ['All-food diet', 'Vegetarian', 'Vegan', 'Keto'];
 
@@ -79,50 +57,36 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
     return Scaffold(
       backgroundColor: Colors.white,
       body: SafeArea(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Expanded(
-              // child: PageView(
-              //   controller: _pageController,
-              //   onPageChanged: (index) {
-              //     setState(() {
-              //       _currentPage = index;
-              //     });
-              //   },
-              //   children: [
-              //     _buildGenderSection(),
-              //     _buildBirthdateSection(),
-              //     _buildWeightSection(),
-              //     _buildHeightSection(),
-              //     _buildTargetWeightSection(),
-              //     _buildGoalSection(),
-              //     _buildActivityLevelSection(),
-              //     _buildDietSection(),
-              //   ],
-              // ),
-              child: Consumer<OnboardingProvider>(
-                builder: (context, onboardingProvider, child) {
-                  return PageView(
+        child: Consumer<OnboardingProvider>(
+          builder: (context, provider, child) {
+            return Column(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Expanded(
+                  child: PageView(
                     controller: _pageController,
-                    onPageChanged:
-                        (index) => onboardingProvider.currentPageIndex(index),
+                    onPageChanged: (index) => provider.currentPageIndex(index),
                     children: [
-                      _buildGenderSection(),
-                      _buildBirthdateSection(),
-                      _buildWeightSection(),
-                      _buildHeightSection(),
-                      _buildTargetWeightSection(),
-                      _buildGoalSection(),
-                      _buildActivityLevelSection(),
-                      _buildDietSection(),
+                      _buildGenderSection(provider),
+                      _buildBirthdateSection(provider),
+                      _buildWeightSection(provider),
+                      _buildHeightSection(provider),
+                      _buildTargetWeightSection(provider),
+                      _buildGoalSection(provider),
+                      _buildActivityLevelSection(provider),
+                      _buildDietSection(provider),
                     ],
-                  );
-                },
-              ),
-            ),
-            _buildNavigationBar(),
-          ],
+                  ),
+                ),
+                _buildNavigationBar(
+                  formKey: _formKey,
+                  context,
+                  _pageController,
+                  provider,
+                ),
+              ],
+            );
+          },
         ),
       ),
     );
@@ -130,7 +94,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
 
   //gender section
 
-  Widget _buildGenderSection() {
+  Widget _buildGenderSection(OnboardingProvider provider) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 50.0, horizontal: 20),
       child: Column(
@@ -144,9 +108,9 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
           Center(
             child: Column(
               children: [
-                _buildGenderOption("Male", "assets/male.png"),
+                _buildGenderOption(provider, "Male", "assets/male.png"),
                 const SizedBox(height: 24),
-                _buildGenderOption("Female", "assets/female.png"),
+                _buildGenderOption(provider, "Female", "assets/female.png"),
               ],
             ),
           ),
@@ -155,53 +119,51 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
     );
   }
 
-  Widget _buildGenderOption(String gender, String imagePath) {
-    return Consumer<OnboardingProvider>(
-      builder: (context, onboardingProvider, child) {
-        final isSelected = onboardingProvider.selectedGender == gender;
-        return GestureDetector(
-          onTap: () => onboardingProvider.selectGender(gender),
-          child: Column(
-            children: [
-              Container(
-                padding: EdgeInsets.all(4),
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  border: Border.all(
-                    color:
-                        isSelected
-                            ? OnboardingScreen.activeColor
-                            : Colors.grey.shade300,
-                    width: 2,
-                  ),
-                ),
-                child: CircleAvatar(
-                  radius: 50,
-                  backgroundImage: AssetImage(imagePath),
-                  backgroundColor: Colors.transparent,
-                ),
+  Widget _buildGenderOption(
+    OnboardingProvider provider,
+    String gender,
+    String imagePath,
+  ) {
+    final isSelected = provider.selectedGender == gender;
+    return GestureDetector(
+      onTap: () => provider.selectGender(gender),
+      child: Column(
+        children: [
+          Container(
+            padding: EdgeInsets.all(4),
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              border: Border.all(
+                color:
+                    isSelected
+                        ? OnboardingScreen.activeColor
+                        : Colors.grey.shade300,
+                width: 2,
               ),
-              const SizedBox(height: 8),
-              Text(
-                gender,
-                style: TextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight.w500,
-                  color:
-                      isSelected ? OnboardingScreen.activeColor : Colors.black,
-                ),
-              ),
-            ],
+            ),
+            child: CircleAvatar(
+              radius: 50,
+              backgroundImage: AssetImage(imagePath),
+              backgroundColor: Colors.transparent,
+            ),
           ),
-        );
-      },
+          const SizedBox(height: 8),
+          Text(
+            gender,
+            style: TextStyle(
+              fontSize: 16,
+              fontWeight: FontWeight.w500,
+              color: isSelected ? OnboardingScreen.activeColor : Colors.black,
+            ),
+          ),
+        ],
+      ),
     );
-    ;
   }
 
   //birthdate section
 
-  Widget _buildBirthdateSection() {
+  Widget _buildBirthdateSection(OnboardingProvider provider) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 50, horizontal: 20),
       child: Column(
@@ -219,27 +181,27 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                 children: [
                   // Day Picker
                   Expanded(
-                    child: _buildPicker(days, selectedDay, (index) {
-                      setState(() {
-                        selectedDay = index;
-                      });
-                    }),
+                    child: _buildPicker(
+                      days,
+                      provider.selectedDay,
+                      provider.setDay,
+                    ),
                   ),
                   // Month Picker
                   Expanded(
-                    child: _buildPicker(months, selectedMonth, (index) {
-                      setState(() {
-                        selectedMonth = index;
-                      });
-                    }),
+                    child: _buildPicker(
+                      months,
+                      provider.selectedMonth,
+                      provider.setMonth,
+                    ),
                   ),
                   // Year Picker
                   Expanded(
-                    child: _buildPicker(years, selectedYear, (index) {
-                      setState(() {
-                        selectedYear = index;
-                      });
-                    }),
+                    child: _buildPicker(
+                      years,
+                      provider.selectedYear,
+                      provider.setYear,
+                    ),
                   ),
                 ],
               ),
@@ -282,7 +244,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
 
   //height section
 
-  Widget _buildHeightSection() {
+  Widget _buildHeightSection(OnboardingProvider provider) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 50, horizontal: 20),
       child: Column(
@@ -297,24 +259,20 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                if (selectedUnit == 1)
+                if (provider.selectedUnit == 1)
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       _buildHeightPicker(
                         items: feetList.map((e) => e.toString()).toList(),
-                        selectedItem: selectedFeet - 1,
-                        onSelected:
-                            (index) =>
-                                setState(() => selectedFeet = feetList[index]),
+                        selectedItem: provider.selectedFeet - 1,
+                        onSelected: (index) => provider.setFeet(index),
                       ),
                       _heightUnitLabel("Ft"),
                       _buildHeightPicker(
                         items: inchList.map((e) => e.toString()).toList(),
-                        selectedItem: selectedInch,
-                        onSelected:
-                            (index) =>
-                                setState(() => selectedInch = inchList[index]),
+                        selectedItem: provider.selectedInch,
+                        onSelected: (index) => provider.setInch(index),
                       ),
                       _heightUnitLabel("In"),
                     ],
@@ -325,10 +283,8 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                     children: [
                       _buildHeightPicker(
                         items: cmList.map((e) => e.toString()).toList(),
-                        selectedItem: selectedCm - 50,
-                        onSelected:
-                            (index) =>
-                                setState(() => selectedCm = cmList[index]),
+                        selectedItem: provider.selectedCm - 50,
+                        onSelected: (index) => provider.setCm(index),
                       ),
                       _heightUnitLabel("Cm"),
                     ],
@@ -349,9 +305,9 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                       child: Text("Ft", style: TextStyle(fontSize: 16)),
                     ),
                   },
-                  groupValue: selectedUnit,
+                  groupValue: provider.selectedUnit,
                   onValueChanged: (value) {
-                    setState(() => selectedUnit = value);
+                    provider.setHeightUnit(value);
                   },
                   selectedColor: OnboardingScreen.activeColor,
                   unselectedColor: CupertinoColors.white,
@@ -418,7 +374,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
 
   //weightSection
 
-  Widget _buildWeightSection() {
+  Widget _buildWeightSection(OnboardingProvider provider) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 50, horizontal: 20),
       child: Column(
@@ -433,16 +389,14 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                if (selectedUnit == 1)
+                if (provider.selectedUnit == 1)
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       _buildWeightPicker(
                         items: feetList.map((e) => e.toString()).toList(),
-                        selectedItem: selectedFeet - 1,
-                        onSelected:
-                            (index) =>
-                                setState(() => selectedFeet = feetList[index]),
+                        selectedItem: provider.selectedWeightLbs - 1,
+                        onSelected: (index) => provider.setWeightLbs(index),
                       ),
                       _weightUnitLabel("Lbs"),
                     ],
@@ -453,10 +407,8 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                     children: [
                       _buildWeightPicker(
                         items: cmList.map((e) => e.toString()).toList(),
-                        selectedItem: selectedCm - 50,
-                        onSelected:
-                            (index) =>
-                                setState(() => selectedCm = cmList[index]),
+                        selectedItem: provider.selectedWeightKg - 50,
+                        onSelected: (index) => provider.setWeightLbs(index),
                       ),
                       _weightUnitLabel("Kg"),
                     ],
@@ -477,9 +429,9 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                       child: Text("Lbs", style: TextStyle(fontSize: 16)),
                     ),
                   },
-                  groupValue: selectedUnit,
+                  groupValue: provider.selectedUnit,
                   onValueChanged: (value) {
-                    setState(() => selectedUnit = value);
+                    provider.setHeightUnit(value);
                   },
                   selectedColor: OnboardingScreen.activeColor,
                   unselectedColor: CupertinoColors.white,
@@ -546,7 +498,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
 
   //target weight section
 
-  Widget _buildTargetWeightSection() {
+  Widget _buildTargetWeightSection(OnboardingProvider provider) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 50, horizontal: 20),
       child: Column(
@@ -561,16 +513,15 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                if (selectedUnit == 1)
+                if (provider.selectedUnit == 1)
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       _buildTargetWeightPicker(
                         items: feetList.map((e) => e.toString()).toList(),
-                        selectedItem: selectedFeet - 1,
+                        selectedItem: provider.selectedTargetWeightLbs - 1,
                         onSelected:
-                            (index) =>
-                                setState(() => selectedFeet = feetList[index]),
+                            (index) => provider.setTargetWeightLbs(index),
                       ),
                       _targetWeightUnitLabel("Lbs"),
                     ],
@@ -581,10 +532,9 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                     children: [
                       _buildTargetWeightPicker(
                         items: cmList.map((e) => e.toString()).toList(),
-                        selectedItem: selectedCm - 50,
+                        selectedItem: provider.selectedTargetWeightKg - 50,
                         onSelected:
-                            (index) =>
-                                setState(() => selectedCm = cmList[index]),
+                            (index) => provider.setTargetWeightKg(index),
                       ),
                       _targetWeightUnitLabel("Kg"),
                     ],
@@ -605,9 +555,9 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                       child: Text("Lbs", style: TextStyle(fontSize: 16)),
                     ),
                   },
-                  groupValue: selectedUnit,
+                  groupValue: provider.selectedUnit,
                   onValueChanged: (value) {
-                    setState(() => selectedUnit = value);
+                    provider.setHeightUnit(value);
                   },
                   selectedColor: OnboardingScreen.activeColor,
                   unselectedColor: CupertinoColors.white,
@@ -674,7 +624,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
 
   //activity level section
 
-  Widget _buildActivityLevelSection() {
+  Widget _buildActivityLevelSection(OnboardingProvider provider) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 50, horizontal: 20),
       child: Column(
@@ -685,21 +635,19 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
             style: TextStyle(fontSize: 25, fontWeight: FontWeight.bold),
           ),
           const SizedBox(height: 50),
-          ...levels.map((level) => _buildActivityLevelOption(level)).toList(),
+          ...levels
+              .map((level) => _buildActivityLevelOption(level, provider))
+              .toList(),
         ],
       ),
     );
   }
 
-  Widget _buildActivityLevelOption(String level) {
-    final isSelected = selectedLevel == level;
+  Widget _buildActivityLevelOption(String level, OnboardingProvider provider) {
+    final isSelected = provider.selectedLevel == level;
 
     return GestureDetector(
-      onTap: () {
-        setState(() {
-          selectedLevel = level;
-        });
-      },
+      onTap: () => provider.setActivityLevel(level),
       child: Container(
         margin: const EdgeInsets.only(bottom: 16),
         padding: const EdgeInsets.symmetric(vertical: 16),
@@ -723,7 +671,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
 
   //goal section
 
-  Widget _buildGoalSection() {
+  Widget _buildGoalSection(OnboardingProvider provider) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 50, horizontal: 20),
       child: Column(
@@ -734,21 +682,17 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
             style: TextStyle(fontSize: 25, fontWeight: FontWeight.bold),
           ),
           const SizedBox(height: 85),
-          ...goals.map((goal) => _buildGoalOption(goal)).toList(),
+          ...goals.map((goal) => _buildGoalOption(goal, provider)).toList(),
         ],
       ),
     );
   }
 
-  Widget _buildGoalOption(String goal) {
-    final isSelected = selectedGoal == goal;
+  Widget _buildGoalOption(String goal, OnboardingProvider provider) {
+    final isSelected = provider.selectedGoal == goal;
 
     return GestureDetector(
-      onTap: () {
-        setState(() {
-          selectedGoal = goal;
-        });
-      },
+      onTap: () => provider.setGoal(goal),
       child: Container(
         margin: const EdgeInsets.only(bottom: 16),
         padding: const EdgeInsets.symmetric(vertical: 16),
@@ -772,7 +716,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
 
   //diet section
 
-  Widget _buildDietSection() {
+  Widget _buildDietSection(OnboardingProvider provider) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 50, horizontal: 20),
       child: Column(
@@ -783,21 +727,17 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
             style: TextStyle(fontSize: 25, fontWeight: FontWeight.bold),
           ),
           const SizedBox(height: 50),
-          ...diets.map((diet) => _buildDietOption(diet)).toList(),
+          ...diets.map((diet) => _buildDietOption(diet, provider)).toList(),
         ],
       ),
     );
   }
 
-  Widget _buildDietOption(String diet) {
-    final isSelected = selectedDiet == diet;
+  Widget _buildDietOption(String diet, OnboardingProvider provider) {
+    final isSelected = provider.selectedDiet == diet;
 
     return GestureDetector(
-      onTap: () {
-        setState(() {
-          selectedDiet = diet;
-        });
-      },
+      onTap: () => provider.setDiet(diet),
       child: Container(
         margin: const EdgeInsets.only(bottom: 16),
         padding: const EdgeInsets.symmetric(vertical: 16),
@@ -821,69 +761,76 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
 
   //navigation section
 
-  Widget _buildNavigationBar() {
+  Widget _buildNavigationBar(
+    BuildContext context,
+    PageController controller,
+    OnboardingProvider provider, {
+    GlobalKey<FormState>? formKey,
+    int totalPages = 8,
+  }) {
     return Container(
-      padding: EdgeInsets.all(20),
+      padding: const EdgeInsets.all(20),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          provider.currentPage > 0
+              ? TextButton(
+                onPressed: () {
+                  controller.previousPage(
+                    duration: const Duration(milliseconds: 300),
+                    curve: Curves.easeInOut,
+                  );
+                },
+                child: const Text(
+                  'Back',
+                  style: TextStyle(color: OnboardingScreen.activeColor),
+                ),
+              )
+              : const SizedBox(),
 
-      child: Consumer<OnboardingProvider>(
-        builder: (context, onboardingProvider, child) {
-          return Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              // _currentPage > 0
-              //     ? TextButton(
-              //       onPressed: () {
-              //         _pageController.previousPage(
-              //           duration: Duration(milliseconds: 300),
-              //           curve: Curves.easeInOut,
-              //         );
-              //       },
-              //       child: Text('Back'),
-              //     )
-              //     : SizedBox(),
-              Row(
-                children: List.generate(
-                  8,
-                  (index) => Container(
-                    width: 8,
-                    height: 8,
-                    margin: EdgeInsets.symmetric(horizontal: 4),
-                    decoration: BoxDecoration(
-                      shape: BoxShape.circle,
-                      color:
-                          onboardingProvider.currentPage == index
-                              ? OnboardingScreen.activeColor
-                              : Colors.grey[300],
-                    ),
-                  ),
+          // Dots indicator
+          Row(
+            children: List.generate(
+              totalPages,
+              (index) => Container(
+                width: 8,
+                height: 8,
+                margin: const EdgeInsets.symmetric(horizontal: 4),
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  color:
+                      provider.currentPage == index
+                          ? OnboardingScreen.activeColor
+                          : Colors.grey[300],
                 ),
               ),
-              onboardingProvider.currentPage < 8
-                  ? IconButton(
-                    style: IconButton.styleFrom(
-                      backgroundColor: OnboardingScreen.activeColor,
-                    ),
-                    onPressed: () {
-                      if (onboardingProvider.currentPage == 1 &&
-                          !_formKey.currentState!.validate()) {
-                        return;
-                      }
-                      _pageController.nextPage(
-                        duration: Duration(milliseconds: 300),
-                        curve: Curves.easeInOut,
-                      );
-                    },
-                    icon: Icon(Ionicons.arrow_forward, color: Colors.white),
-                  )
-                  : ElevatedButton(
-                    onPressed: null,
+            ),
+          ),
 
-                    // onPressed: _completeOnboarding,
-                    child: Text('Get Started'),
-                  ),
-            ],
-          );
-        },
+          // Next button or Get Started
+          provider.currentPage < totalPages - 1
+              ? IconButton(
+                style: IconButton.styleFrom(
+                  backgroundColor: OnboardingScreen.activeColor,
+                ),
+                onPressed: () {
+                  if (provider.currentPage == 1 &&
+                      formKey != null &&
+                      !formKey.currentState!.validate()) {
+                    return;
+                  }
+                  controller.nextPage(
+                    duration: const Duration(milliseconds: 300),
+                    curve: Curves.easeInOut,
+                  );
+                },
+                icon: const Icon(Ionicons.arrow_forward, color: Colors.white),
+              )
+              : ElevatedButton(
+                onPressed: () {},
+                child: const Text('Get Started'),
+              ),
+        ],
       ),
     );
   }
