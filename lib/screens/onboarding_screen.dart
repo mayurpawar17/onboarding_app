@@ -1,6 +1,5 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/svg.dart';
 import 'package:ionicons/ionicons.dart';
 
 class OnboardingScreen extends StatefulWidget {
@@ -14,6 +13,8 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
   final PageController _pageController = PageController();
   int _currentPage = 0;
   final _formKey = GlobalKey<FormState>();
+
+  String? selectedGender;
 
   List<String> days = List.generate(
     31,
@@ -107,44 +108,61 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
 
   Widget _buildGenderSection() {
     return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 50, horizontal: 20),
+      padding: const EdgeInsets.symmetric(vertical: 50.0, horizontal: 20),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
-
         children: [
           Text(
-            'Which gender do you \n identify as?',
+            "Which gender do you identify as?",
             style: TextStyle(fontSize: 25, fontWeight: FontWeight.bold),
           ),
-          SizedBox(height: 80),
+          const SizedBox(height: 80),
           Center(
             child: Column(
               children: [
-                Column(
-                  children: [
-                    SvgPicture.asset(
-                      'assets/male.svg',
-                      width: 100,
-                      height: 100,
-                    ),
-                    Text('Male', style: TextStyle(fontWeight: FontWeight.bold)),
-                  ],
-                ),
-                SizedBox(height: 50),
-                Column(
-                  children: [
-                    SvgPicture.asset(
-                      'assets/female.svg',
-                      width: 100,
-                      height: 100,
-                    ),
-                    Text(
-                      'Female',
-                      style: TextStyle(fontWeight: FontWeight.bold),
-                    ),
-                  ],
-                ),
+                _buildGenderOption("Male", "assets/male.png"),
+                const SizedBox(height: 24),
+                _buildGenderOption("Female", "assets/female.png"),
               ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildGenderOption(String gender, String imagePath) {
+    final isSelected = selectedGender == gender;
+    return GestureDetector(
+      onTap: () {
+        setState(() {
+          selectedGender = gender;
+        });
+      },
+      child: Column(
+        children: [
+          Container(
+            padding: EdgeInsets.all(4),
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              border: Border.all(
+                color: isSelected ? Colors.deepPurple : Colors.grey.shade300,
+                width: 2,
+              ),
+            ),
+            child: CircleAvatar(
+              radius: 50,
+              backgroundImage: AssetImage(imagePath),
+              backgroundColor: Colors.transparent,
+            ),
+          ),
+          const SizedBox(height: 8),
+          Text(
+            gender,
+            style: TextStyle(
+              fontSize: 16,
+              fontWeight: FontWeight.w500,
+              color: isSelected ? Colors.deepPurple : Colors.black,
             ),
           ),
         ],
@@ -506,10 +524,10 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            "What's your Target\n  Weight?",
+            "What's your Target\nWeight?",
             style: TextStyle(fontSize: 25, fontWeight: FontWeight.bold),
           ),
-          SizedBox(height: 20),
+          SizedBox(height: 50),
           Center(
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
@@ -543,7 +561,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                     ],
                   ),
 
-                const SizedBox(height: 30),
+                const SizedBox(height: 25),
 
                 // Toggle switch
                 CupertinoSegmentedControl<int>(
