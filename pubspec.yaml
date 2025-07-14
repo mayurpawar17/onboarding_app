@@ -38,6 +38,7 @@ dependencies:
   google_fonts:
   flutter_svg: ^2.2.0
   ionicons: ^0.2.2
+  shared_preferences: ^2.5.3
 
 dev_dependencies:
   flutter_test:

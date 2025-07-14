@@ -3,6 +3,9 @@ import 'package:flutter/material.dart';
 import 'package:ionicons/ionicons.dart';
 import 'package:onboarding_app/providers/onboarding_provider.dart';
 import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+
+import 'home_screen.dart';
 
 class OnboardingScreen extends StatefulWidget {
   static const activeColor = Color(0Xff6c63ff);
@@ -39,15 +42,15 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
   ];
   List<String> years = List.generate(40, (index) => (1985 + index).toString());
 
-  final List<int> kgList = List.generate(610, (index) => index + 30);
-  final List<int> lbsList = List.generate(1340, (index) => index + 66);
-
-  final List<int> feetList = List.generate(9, (index) => index + 1); // 1 to 9
-  final List<int> inchList = List.generate(11, (index) => index); // 0 to 10
-  final List<int> cmList = List.generate(
-    250,
-    (index) => index + 50,
-  ); // 50 to 200
+  // final List<int> kgList = List.generate(610, (index) => index + 30);
+  // final List<int> lbsList = List.generate(1340, (index) => index + 66);
+  //
+  // final List<int> feetList = List.generate(9, (index) => index + 1); // 1 to 9
+  // final List<int> inchList = List.generate(11, (index) => index); // 0 to 10
+  // final List<int> cmList = List.generate(
+  //   250,
+  //   (index) => index + 50,
+  // ); // 50 to 200
 
   final List<String> goals = ['Lose Weight', 'Gain Muscle', 'Keep Fit'];
 
@@ -272,13 +275,19 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         _buildHeightPicker(
-                          items: feetList.map((e) => e.toString()).toList(),
-                          selectedItem: provider.selectedFeet ,
+                          items:
+                              provider.feetList
+                                  .map((e) => e.toString())
+                                  .toList(),
+                          selectedItem: provider.selectedFeet,
                           onSelected: (index) => provider.setFeet(index),
                         ),
                         _heightUnitLabel("Ft"),
                         _buildHeightPicker(
-                          items: inchList.map((e) => e.toString()).toList(),
+                          items:
+                              provider.inchList
+                                  .map((e) => e.toString())
+                                  .toList(),
                           selectedItem: provider.selectedInch,
                           onSelected: (index) => provider.setInch(index),
                         ),
@@ -290,8 +299,9 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         _buildHeightPicker(
-                          items: cmList.map((e) => e.toString()).toList(),
-                          selectedItem: provider.selectedCm ,
+                          items:
+                              provider.cmList.map((e) => e.toString()).toList(),
+                          selectedItem: provider.selectedCm,
                           onSelected: (index) => provider.setCm(index),
                         ),
                         _heightUnitLabel("Cm"),
@@ -405,8 +415,11 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         _buildWeightPicker(
-                          items: lbsList.map((e) => e.toString()).toList(),
-                          selectedItem: provider.selectedWeightLbs ,
+                          items:
+                              provider.lbsList
+                                  .map((e) => e.toString())
+                                  .toList(),
+                          selectedItem: provider.selectedWeightLbs,
                           onSelected: (index) => provider.setWeightLbs(index),
                         ),
                         _weightUnitLabel("Lbs"),
@@ -417,8 +430,9 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         _buildWeightPicker(
-                          items: kgList.map((e) => e.toString()).toList(),
-                          selectedItem: provider.selectedWeightKg ,
+                          items:
+                              provider.kgList.map((e) => e.toString()).toList(),
+                          selectedItem: provider.selectedWeightKg,
                           onSelected: (index) => provider.setWeightKg(index),
                         ),
                         _weightUnitLabel("Kg"),
@@ -532,8 +546,11 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         _buildTargetWeightPicker(
-                          items: lbsList.map((e) => e.toString()).toList(),
-                          selectedItem: provider.selectedTargetWeightLbs ,
+                          items:
+                              provider.lbsList
+                                  .map((e) => e.toString())
+                                  .toList(),
+                          selectedItem: provider.selectedTargetWeightLbs,
                           onSelected:
                               (index) => provider.setTargetWeightLbs(index),
                         ),
@@ -545,8 +562,9 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         _buildTargetWeightPicker(
-                          items: kgList.map((e) => e.toString()).toList(),
-                          selectedItem: provider.selectedTargetWeightKg ,
+                          items:
+                              provider.kgList.map((e) => e.toString()).toList(),
+                          selectedItem: provider.selectedTargetWeightKg,
                           onSelected:
                               (index) => provider.setTargetWeightKg(index),
                         ),
@@ -783,78 +801,128 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
     GlobalKey<FormState>? formKey,
     int totalPages = 8,
   }) {
-    return SingleChildScrollView(
-      scrollDirection: Axis.horizontal,
-      child: Container(
-        padding: const EdgeInsets.all(20),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            provider.currentPage > 0
-                ? TextButton(
-                  onPressed: () {
-                    controller.previousPage(
-                      duration: const Duration(milliseconds: 300),
-                      curve: Curves.easeInOut,
-                    );
-                  },
-                  child: const Text(
-                    'Back',
-                    style: TextStyle(color: OnboardingScreen.activeColor),
-                  ),
-                )
-                : const SizedBox(),
-
-            // Dots indicator
-            Row(
-              children: List.generate(
-                totalPages,
-                (index) => Container(
-                  width: 8,
-                  height: 8,
-                  margin: const EdgeInsets.symmetric(horizontal: 4),
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    color:
-                        provider.currentPage == index
-                            ? OnboardingScreen.activeColor
-                            : Colors.grey[300],
-                  ),
+    return Container(
+      padding: const EdgeInsets.all(20),
+      width: double.infinity, // ✅ Ensures Row expands to full width
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          // Back Button
+          provider.currentPage > 0
+              ? IconButton(
+                style: IconButton.styleFrom(
+                  backgroundColor: OnboardingScreen.activeColor,
+                ),
+                onPressed: () {
+                  controller.previousPage(
+                    duration: const Duration(milliseconds: 300),
+                    curve: Curves.easeInOut,
+                  );
+                },
+                icon: const Icon(Ionicons.arrow_back, color: Colors.white),
+              )
+              : const SizedBox(width: 60), // give same width for layout balance
+          // Dots indicator
+          Row(
+            children: List.generate(
+              totalPages,
+              (index) => Container(
+                width: 8,
+                height: 8,
+                margin: const EdgeInsets.symmetric(horizontal: 4),
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  color:
+                      provider.currentPage == index
+                          ? OnboardingScreen.activeColor
+                          : Colors.grey[300],
                 ),
               ),
             ),
+          ),
 
-            // Next button or Get Started
-            provider.currentPage < totalPages - 1
-                ? IconButton(
-                  style: IconButton.styleFrom(
-                    backgroundColor: OnboardingScreen.activeColor,
-                  ),
-                  onPressed: () {
-                    // if (provider.currentPage == 1 &&
-                    //     formKey != null &&
-                    //     !formKey.currentState!.validate()) {
-                    //   return;
-                    // }
-                    controller.nextPage(
-                      duration: const Duration(milliseconds: 300),
-                      curve: Curves.easeInOut,
-                    );
-                  },
-                  icon: const Icon(Ionicons.arrow_forward, color: Colors.white),
-                )
-                : ElevatedButton(
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: OnboardingScreen.activeColor,
-                  ),
-                  onPressed: () {},
-                  child: const Text(
-                    'Get Started',
-                    style: TextStyle(color: Colors.white),
-                  ),
+          // Next or Get Started
+          provider.currentPage < totalPages - 1
+              ? IconButton(
+                style: IconButton.styleFrom(
+                  backgroundColor: OnboardingScreen.activeColor,
                 ),
-          ],
-        ),
+                onPressed: () {
+                  controller.nextPage(
+                    duration: const Duration(milliseconds: 300),
+                    curve: Curves.easeInOut,
+                  );
+                },
+                icon: const Icon(Ionicons.arrow_forward, color: Colors.white),
+              )
+              : ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: OnboardingScreen.activeColor,
+                ),
+                onPressed: _completeOnboarding,
+                child: const Text(
+                  'Get Started',
+                  style: TextStyle(color: Colors.white),
+                ),
+              ),
+        ],
+      ),
+    );
+  }
+
+  void _completeOnboarding() async {
+    final onboardingProvider = Provider.of<OnboardingProvider>(
+      context,
+      listen: false,
+    );
+
+    String? gender = onboardingProvider.selectedGender;
+    String birthdate =
+        "${onboardingProvider.selectedDay + 1}-${onboardingProvider.selectedMonth + 1}-${1985 + onboardingProvider.selectedYear}";
+    int weight =
+        onboardingProvider.selectedUnit == 0
+            ? onboardingProvider.kgList[onboardingProvider.selectedWeightKg]
+            : onboardingProvider.lbsList[onboardingProvider.selectedWeightLbs];
+    int targetWeight =
+        onboardingProvider.selectedUnit == 0
+            ? onboardingProvider.kgList[onboardingProvider
+                .selectedTargetWeightKg]
+            : onboardingProvider.lbsList[onboardingProvider
+                .selectedTargetWeightLbs];
+    String height =
+        onboardingProvider.selectedUnit == 0
+            ? "${onboardingProvider.cmList[onboardingProvider.selectedCm]} cm"
+            : "${onboardingProvider.feetList[onboardingProvider.selectedFeet]}' ${onboardingProvider.inchList[onboardingProvider.selectedInch]}\"";
+    String goal = onboardingProvider.selectedGoal;
+    String activityLevel = onboardingProvider.selectedLevel;
+    String diet = onboardingProvider.selectedDiet;
+
+    // ✅ Save to SharedPreferences
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    await prefs.setString('gender', gender ?? 'not set');
+    await prefs.setString('birthdate', birthdate);
+    await prefs.setInt('weight', weight);
+    await prefs.setInt('targetWeight', targetWeight);
+    await prefs.setString('height', height);
+    await prefs.setString('goal', goal);
+    await prefs.setString('activityLevel', activityLevel);
+    await prefs.setString('diet', diet);
+
+    // ✅ Navigate to HomeScreen
+    Navigator.pushReplacement(
+      context,
+      MaterialPageRoute(
+        builder:
+            (_) => HomeScreen(
+              gender: gender,
+              birthdate: birthdate,
+              weight: weight,
+              targetWeight: targetWeight,
+              height: height,
+              goal: goal,
+              activityLevel: activityLevel,
+              diet: diet,
+            ),
       ),
     );
   }

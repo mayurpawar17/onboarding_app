@@ -1,6 +1,16 @@
 import 'package:flutter/material.dart';
 
 class OnboardingProvider with ChangeNotifier {
+  final List<int> kgList = List.generate(610, (index) => index + 30);
+  final List<int> lbsList = List.generate(1340, (index) => index + 66);
+
+  final List<int> feetList = List.generate(9, (index) => index + 1); // 1 to 9
+  final List<int> inchList = List.generate(11, (index) => index); // 0 to 10
+  final List<int> cmList = List.generate(
+    250,
+    (index) => index + 50,
+  ); // 50 to 200
+
   // PageView controller
   int _currentPage = 0;
 
