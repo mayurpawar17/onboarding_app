@@ -22,8 +22,8 @@ class OnboardingProvider with ChangeNotifier {
   }
 
   // Birthdate selection
-  int _selectedDay = 0;
-  int _selectedMonth = 0;
+  int _selectedDay = 11;
+  int _selectedMonth = 5;
   int _selectedYear = 5;
 
   int get selectedDay => _selectedDay;

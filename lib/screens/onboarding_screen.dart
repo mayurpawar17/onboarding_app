@@ -39,6 +39,9 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
   ];
   List<String> years = List.generate(40, (index) => (1985 + index).toString());
 
+  final List<int> kgList = List.generate(610, (index) => index + 30);
+  final List<int> lbsList = List.generate(1340, (index) => index + 66);
+
   final List<int> feetList = List.generate(9, (index) => index + 1); // 1 to 9
   final List<int> inchList = List.generate(11, (index) => index); // 0 to 10
   final List<int> cmList = List.generate(
@@ -164,50 +167,53 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
   //birthdate section
 
   Widget _buildBirthdateSection(OnboardingProvider provider) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 50, horizontal: 20),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            "What's your Birthdate ?",
-            style: TextStyle(fontSize: 25, fontWeight: FontWeight.bold),
-          ),
-          SizedBox(height: 80),
-          Center(
-            child: SizedBox(
-              height: 450,
-              child: Row(
-                children: [
-                  // Day Picker
-                  Expanded(
-                    child: _buildPicker(
-                      days,
-                      provider.selectedDay,
-                      provider.setDay,
+    return SingleChildScrollView(
+      scrollDirection: Axis.vertical,
+      child: Padding(
+        padding: const EdgeInsets.symmetric(vertical: 50, horizontal: 20),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              "What's your Birthdate ?",
+              style: TextStyle(fontSize: 25, fontWeight: FontWeight.bold),
+            ),
+            SizedBox(height: 80),
+            Center(
+              child: SizedBox(
+                height: 450,
+                child: Row(
+                  children: [
+                    // Day Picker
+                    Expanded(
+                      child: _buildPicker(
+                        days,
+                        provider.selectedDay,
+                        provider.setDay,
+                      ),
                     ),
-                  ),
-                  // Month Picker
-                  Expanded(
-                    child: _buildPicker(
-                      months,
-                      provider.selectedMonth,
-                      provider.setMonth,
+                    // Month Picker
+                    Expanded(
+                      child: _buildPicker(
+                        months,
+                        provider.selectedMonth,
+                        provider.setMonth,
+                      ),
                     ),
-                  ),
-                  // Year Picker
-                  Expanded(
-                    child: _buildPicker(
-                      years,
-                      provider.selectedYear,
-                      provider.setYear,
+                    // Year Picker
+                    Expanded(
+                      child: _buildPicker(
+                        years,
+                        provider.selectedYear,
+                        provider.setYear,
+                      ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
@@ -245,79 +251,82 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
   //height section
 
   Widget _buildHeightSection(OnboardingProvider provider) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 50, horizontal: 20),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            "What's your Height?",
-            style: TextStyle(fontSize: 25, fontWeight: FontWeight.bold),
-          ),
-          SizedBox(height: 80),
-          Center(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                if (provider.selectedUnit == 1)
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      _buildHeightPicker(
-                        items: feetList.map((e) => e.toString()).toList(),
-                        selectedItem: provider.selectedFeet - 1,
-                        onSelected: (index) => provider.setFeet(index),
-                      ),
-                      _heightUnitLabel("Ft"),
-                      _buildHeightPicker(
-                        items: inchList.map((e) => e.toString()).toList(),
-                        selectedItem: provider.selectedInch,
-                        onSelected: (index) => provider.setInch(index),
-                      ),
-                      _heightUnitLabel("In"),
-                    ],
-                  )
-                else
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      _buildHeightPicker(
-                        items: cmList.map((e) => e.toString()).toList(),
-                        selectedItem: provider.selectedCm - 50,
-                        onSelected: (index) => provider.setCm(index),
-                      ),
-                      _heightUnitLabel("Cm"),
-                    ],
-                  ),
-
-                const SizedBox(height: 30),
-
-                // Toggle switch
-                CupertinoSegmentedControl<int>(
-                  padding: EdgeInsets.symmetric(horizontal: 80, vertical: 4),
-                  children: {
-                    0: Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 18),
-                      child: Text("Cm", style: TextStyle(fontSize: 16)),
-                    ),
-                    1: Padding(
-                      padding: EdgeInsets.symmetric(horizontal: 18),
-                      child: Text("Ft", style: TextStyle(fontSize: 16)),
-                    ),
-                  },
-                  groupValue: provider.selectedUnit,
-                  onValueChanged: (value) {
-                    provider.setHeightUnit(value);
-                  },
-                  selectedColor: OnboardingScreen.activeColor,
-                  unselectedColor: CupertinoColors.white,
-                  borderColor: OnboardingScreen.activeColor,
-                  pressedColor: CupertinoColors.systemGrey4,
-                ),
-              ],
+    return SingleChildScrollView(
+      scrollDirection: Axis.vertical,
+      child: Padding(
+        padding: const EdgeInsets.symmetric(vertical: 50, horizontal: 20),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              "What's your Height?",
+              style: TextStyle(fontSize: 25, fontWeight: FontWeight.bold),
             ),
-          ),
-        ],
+            SizedBox(height: 80),
+            Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  if (provider.selectedUnit == 1)
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        _buildHeightPicker(
+                          items: feetList.map((e) => e.toString()).toList(),
+                          selectedItem: provider.selectedFeet ,
+                          onSelected: (index) => provider.setFeet(index),
+                        ),
+                        _heightUnitLabel("Ft"),
+                        _buildHeightPicker(
+                          items: inchList.map((e) => e.toString()).toList(),
+                          selectedItem: provider.selectedInch,
+                          onSelected: (index) => provider.setInch(index),
+                        ),
+                        _heightUnitLabel("In"),
+                      ],
+                    )
+                  else
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        _buildHeightPicker(
+                          items: cmList.map((e) => e.toString()).toList(),
+                          selectedItem: provider.selectedCm ,
+                          onSelected: (index) => provider.setCm(index),
+                        ),
+                        _heightUnitLabel("Cm"),
+                      ],
+                    ),
+
+                  const SizedBox(height: 30),
+
+                  // Toggle switch
+                  CupertinoSegmentedControl<int>(
+                    padding: EdgeInsets.symmetric(horizontal: 80, vertical: 4),
+                    children: {
+                      0: Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 18),
+                        child: Text("Cm", style: TextStyle(fontSize: 16)),
+                      ),
+                      1: Padding(
+                        padding: EdgeInsets.symmetric(horizontal: 18),
+                        child: Text("Ft", style: TextStyle(fontSize: 16)),
+                      ),
+                    },
+                    groupValue: provider.selectedUnit,
+                    onValueChanged: (value) {
+                      provider.setHeightUnit(value);
+                    },
+                    selectedColor: OnboardingScreen.activeColor,
+                    unselectedColor: CupertinoColors.white,
+                    borderColor: OnboardingScreen.activeColor,
+                    pressedColor: CupertinoColors.systemGrey4,
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -329,7 +338,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
   }) {
     return SizedBox(
       width: 80,
-      height: 450,
+      height: MediaQuery.of(context).size.height * 0.5,
       child: CupertinoPicker(
         scrollController: FixedExtentScrollController(
           initialItem: selectedItem,
@@ -372,76 +381,79 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
     );
   }
 
-  //weightSection
+  //weight Section
 
   Widget _buildWeightSection(OnboardingProvider provider) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 50, horizontal: 20),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            "What's your Weight?",
-            style: TextStyle(fontSize: 25, fontWeight: FontWeight.bold),
-          ),
-          SizedBox(height: 80),
-          Center(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                if (provider.selectedUnit == 1)
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      _buildWeightPicker(
-                        items: feetList.map((e) => e.toString()).toList(),
-                        selectedItem: provider.selectedWeightLbs - 1,
-                        onSelected: (index) => provider.setWeightLbs(index),
-                      ),
-                      _weightUnitLabel("Lbs"),
-                    ],
-                  )
-                else
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      _buildWeightPicker(
-                        items: cmList.map((e) => e.toString()).toList(),
-                        selectedItem: provider.selectedWeightKg - 50,
-                        onSelected: (index) => provider.setWeightLbs(index),
-                      ),
-                      _weightUnitLabel("Kg"),
-                    ],
-                  ),
-
-                const SizedBox(height: 30),
-
-                // Toggle switch
-                CupertinoSegmentedControl<int>(
-                  padding: EdgeInsets.symmetric(horizontal: 80, vertical: 4),
-                  children: {
-                    0: Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 18),
-                      child: Text("Kg", style: TextStyle(fontSize: 16)),
-                    ),
-                    1: Padding(
-                      padding: EdgeInsets.symmetric(horizontal: 18),
-                      child: Text("Lbs", style: TextStyle(fontSize: 16)),
-                    ),
-                  },
-                  groupValue: provider.selectedUnit,
-                  onValueChanged: (value) {
-                    provider.setHeightUnit(value);
-                  },
-                  selectedColor: OnboardingScreen.activeColor,
-                  unselectedColor: CupertinoColors.white,
-                  borderColor: OnboardingScreen.activeColor,
-                  pressedColor: CupertinoColors.systemGrey4,
-                ),
-              ],
+    return SingleChildScrollView(
+      scrollDirection: Axis.vertical,
+      child: Padding(
+        padding: const EdgeInsets.symmetric(vertical: 50, horizontal: 20),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              "What's your Weight?",
+              style: TextStyle(fontSize: 25, fontWeight: FontWeight.bold),
             ),
-          ),
-        ],
+            SizedBox(height: 80),
+            Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  if (provider.selectedUnit == 1)
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        _buildWeightPicker(
+                          items: lbsList.map((e) => e.toString()).toList(),
+                          selectedItem: provider.selectedWeightLbs ,
+                          onSelected: (index) => provider.setWeightLbs(index),
+                        ),
+                        _weightUnitLabel("Lbs"),
+                      ],
+                    )
+                  else
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        _buildWeightPicker(
+                          items: kgList.map((e) => e.toString()).toList(),
+                          selectedItem: provider.selectedWeightKg ,
+                          onSelected: (index) => provider.setWeightKg(index),
+                        ),
+                        _weightUnitLabel("Kg"),
+                      ],
+                    ),
+
+                  const SizedBox(height: 30),
+
+                  // Toggle switch
+                  CupertinoSegmentedControl<int>(
+                    padding: EdgeInsets.symmetric(horizontal: 80, vertical: 4),
+                    children: {
+                      0: Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 18),
+                        child: Text("Kg", style: TextStyle(fontSize: 16)),
+                      ),
+                      1: Padding(
+                        padding: EdgeInsets.symmetric(horizontal: 18),
+                        child: Text("Lbs", style: TextStyle(fontSize: 16)),
+                      ),
+                    },
+                    groupValue: provider.selectedUnit,
+                    onValueChanged: (value) {
+                      provider.setHeightUnit(value);
+                    },
+                    selectedColor: OnboardingScreen.activeColor,
+                    unselectedColor: CupertinoColors.white,
+                    borderColor: OnboardingScreen.activeColor,
+                    pressedColor: CupertinoColors.systemGrey4,
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -453,7 +465,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
   }) {
     return SizedBox(
       width: 80,
-      height: 450,
+      height: MediaQuery.of(context).size.height * 0.5,
       child: CupertinoPicker(
         scrollController: FixedExtentScrollController(
           initialItem: selectedItem,
@@ -499,75 +511,78 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
   //target weight section
 
   Widget _buildTargetWeightSection(OnboardingProvider provider) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 50, horizontal: 20),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            "What's your Target\nWeight?",
-            style: TextStyle(fontSize: 25, fontWeight: FontWeight.bold),
-          ),
-          SizedBox(height: 50),
-          Center(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                if (provider.selectedUnit == 1)
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      _buildTargetWeightPicker(
-                        items: feetList.map((e) => e.toString()).toList(),
-                        selectedItem: provider.selectedTargetWeightLbs - 1,
-                        onSelected:
-                            (index) => provider.setTargetWeightLbs(index),
-                      ),
-                      _targetWeightUnitLabel("Lbs"),
-                    ],
-                  )
-                else
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      _buildTargetWeightPicker(
-                        items: cmList.map((e) => e.toString()).toList(),
-                        selectedItem: provider.selectedTargetWeightKg - 50,
-                        onSelected:
-                            (index) => provider.setTargetWeightKg(index),
-                      ),
-                      _targetWeightUnitLabel("Kg"),
-                    ],
-                  ),
-
-                const SizedBox(height: 25),
-
-                // Toggle switch
-                CupertinoSegmentedControl<int>(
-                  padding: EdgeInsets.symmetric(horizontal: 80, vertical: 4),
-                  children: {
-                    0: Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 18),
-                      child: Text("Kg", style: TextStyle(fontSize: 16)),
-                    ),
-                    1: Padding(
-                      padding: EdgeInsets.symmetric(horizontal: 18),
-                      child: Text("Lbs", style: TextStyle(fontSize: 16)),
-                    ),
-                  },
-                  groupValue: provider.selectedUnit,
-                  onValueChanged: (value) {
-                    provider.setHeightUnit(value);
-                  },
-                  selectedColor: OnboardingScreen.activeColor,
-                  unselectedColor: CupertinoColors.white,
-                  borderColor: OnboardingScreen.activeColor,
-                  pressedColor: CupertinoColors.systemGrey4,
-                ),
-              ],
+    return SingleChildScrollView(
+      scrollDirection: Axis.vertical,
+      child: Padding(
+        padding: const EdgeInsets.symmetric(vertical: 50, horizontal: 20),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              "What's your Target\nWeight?",
+              style: TextStyle(fontSize: 25, fontWeight: FontWeight.bold),
             ),
-          ),
-        ],
+            SizedBox(height: 50),
+            Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  if (provider.selectedUnit == 1)
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        _buildTargetWeightPicker(
+                          items: lbsList.map((e) => e.toString()).toList(),
+                          selectedItem: provider.selectedTargetWeightLbs ,
+                          onSelected:
+                              (index) => provider.setTargetWeightLbs(index),
+                        ),
+                        _targetWeightUnitLabel("Lbs"),
+                      ],
+                    )
+                  else
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        _buildTargetWeightPicker(
+                          items: kgList.map((e) => e.toString()).toList(),
+                          selectedItem: provider.selectedTargetWeightKg ,
+                          onSelected:
+                              (index) => provider.setTargetWeightKg(index),
+                        ),
+                        _targetWeightUnitLabel("Kg"),
+                      ],
+                    ),
+
+                  const SizedBox(height: 25),
+
+                  // Toggle switch
+                  CupertinoSegmentedControl<int>(
+                    padding: EdgeInsets.symmetric(horizontal: 80, vertical: 4),
+                    children: {
+                      0: Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 18),
+                        child: Text("Kg", style: TextStyle(fontSize: 16)),
+                      ),
+                      1: Padding(
+                        padding: EdgeInsets.symmetric(horizontal: 18),
+                        child: Text("Lbs", style: TextStyle(fontSize: 16)),
+                      ),
+                    },
+                    groupValue: provider.selectedUnit,
+                    onValueChanged: (value) {
+                      provider.setHeightUnit(value);
+                    },
+                    selectedColor: OnboardingScreen.activeColor,
+                    unselectedColor: CupertinoColors.white,
+                    borderColor: OnboardingScreen.activeColor,
+                    pressedColor: CupertinoColors.systemGrey4,
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -579,7 +594,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
   }) {
     return SizedBox(
       width: 80,
-      height: 450,
+      height: MediaQuery.of(context).size.height * 0.5,
       child: CupertinoPicker(
         scrollController: FixedExtentScrollController(
           initialItem: selectedItem,
@@ -768,69 +783,78 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
     GlobalKey<FormState>? formKey,
     int totalPages = 8,
   }) {
-    return Container(
-      padding: const EdgeInsets.all(20),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          provider.currentPage > 0
-              ? TextButton(
-                onPressed: () {
-                  controller.previousPage(
-                    duration: const Duration(milliseconds: 300),
-                    curve: Curves.easeInOut,
-                  );
-                },
-                child: const Text(
-                  'Back',
-                  style: TextStyle(color: OnboardingScreen.activeColor),
-                ),
-              )
-              : const SizedBox(),
+    return SingleChildScrollView(
+      scrollDirection: Axis.horizontal,
+      child: Container(
+        padding: const EdgeInsets.all(20),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            provider.currentPage > 0
+                ? TextButton(
+                  onPressed: () {
+                    controller.previousPage(
+                      duration: const Duration(milliseconds: 300),
+                      curve: Curves.easeInOut,
+                    );
+                  },
+                  child: const Text(
+                    'Back',
+                    style: TextStyle(color: OnboardingScreen.activeColor),
+                  ),
+                )
+                : const SizedBox(),
 
-          // Dots indicator
-          Row(
-            children: List.generate(
-              totalPages,
-              (index) => Container(
-                width: 8,
-                height: 8,
-                margin: const EdgeInsets.symmetric(horizontal: 4),
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  color:
-                      provider.currentPage == index
-                          ? OnboardingScreen.activeColor
-                          : Colors.grey[300],
+            // Dots indicator
+            Row(
+              children: List.generate(
+                totalPages,
+                (index) => Container(
+                  width: 8,
+                  height: 8,
+                  margin: const EdgeInsets.symmetric(horizontal: 4),
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    color:
+                        provider.currentPage == index
+                            ? OnboardingScreen.activeColor
+                            : Colors.grey[300],
+                  ),
                 ),
               ),
             ),
-          ),
 
-          // Next button or Get Started
-          provider.currentPage < totalPages - 1
-              ? IconButton(
-                style: IconButton.styleFrom(
-                  backgroundColor: OnboardingScreen.activeColor,
+            // Next button or Get Started
+            provider.currentPage < totalPages - 1
+                ? IconButton(
+                  style: IconButton.styleFrom(
+                    backgroundColor: OnboardingScreen.activeColor,
+                  ),
+                  onPressed: () {
+                    // if (provider.currentPage == 1 &&
+                    //     formKey != null &&
+                    //     !formKey.currentState!.validate()) {
+                    //   return;
+                    // }
+                    controller.nextPage(
+                      duration: const Duration(milliseconds: 300),
+                      curve: Curves.easeInOut,
+                    );
+                  },
+                  icon: const Icon(Ionicons.arrow_forward, color: Colors.white),
+                )
+                : ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: OnboardingScreen.activeColor,
+                  ),
+                  onPressed: () {},
+                  child: const Text(
+                    'Get Started',
+                    style: TextStyle(color: Colors.white),
+                  ),
                 ),
-                onPressed: () {
-                  if (provider.currentPage == 1 &&
-                      formKey != null &&
-                      !formKey.currentState!.validate()) {
-                    return;
-                  }
-                  controller.nextPage(
-                    duration: const Duration(milliseconds: 300),
-                    curve: Curves.easeInOut,
-                  );
-                },
-                icon: const Icon(Ionicons.arrow_forward, color: Colors.white),
-              )
-              : ElevatedButton(
-                onPressed: () {},
-                child: const Text('Get Started'),
-              ),
-        ],
+          ],
+        ),
       ),
     );
   }
